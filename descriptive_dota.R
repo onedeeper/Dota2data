@@ -14,6 +14,12 @@ heroes$id <- as.factor(heroes$id)
 rtz$match_id <- as.factor(rtz$match_id)
 #convert the durtaion from seconds to minutes
 rtz$duration <- rtz$duration/60
+#rename player slot to reflect radiant/dire
+rtz$player_slot <- ifelse(rtz$player_slot <= 127,"radiant","dire")
+#change skill column name since its not being used, to win/lose status
+colnames(rtz)[13] <- "win/lose"
+# Win/lose status for each match
+rtz$`win/lose`<- ifelse((rtz$player_slot == "radiant") & (rtz$radiant_win == 1) | (rtz$player_slot == "dire") & (rtz$radiant_win == 0),"win","lose")
 
 # A plot of kills of each game with jitter and opacity added to visualize region of central
 # tendency
@@ -37,3 +43,8 @@ skew(rtz$kills)
 
 #kurtosis of kills
 kurtosi(rtz$kills)
+
+#Arteezy kill score vs match duration. I've added a jitter to the kill scores - this adds
+#some noise to the kill scores because otherwise they are all discrete values and will
+#be on top of each other (i.e many games with exactly 6 kills)
+plot(rtz$duration,jitter(rtz$kills,5), col = scales::alpha("black",0.15), pch = 16, xlab = "Match Duration (minutes)", ylab = "Kill Score (kills)", main = "Arteezy Kill Score Vs. Match Duration")
