@@ -2,6 +2,10 @@
 library(lsr)
 library(scales)
 library(psych)
+library(ggplot2)
+library(dplyr)
+library(plyr)
+#Read a dataset in csv format
 rtz <- read.csv("/Users/udeshhabaraduwa/Google Drive/Misc/Dota2data/rtz.csv")
 heroes <- read.csv("/Users/udeshhabaraduwa/Google Drive/Misc/Dota2data/heroes.csv")
 
@@ -17,13 +21,17 @@ rtz$duration <- rtz$duration/60
 #rename player slot to reflect radiant/dire
 rtz$player_slot <- ifelse(rtz$player_slot <= 127,"radiant","dire")
 #change skill column name since its not being used, to win/lose status
-colnames(rtz)[13] <- "win/lose"
+colnames(rtz)[13] <- "win_lose"
 # Win/lose status for each match
-rtz$`win/lose`<- ifelse((rtz$player_slot == "radiant") & (rtz$radiant_win == 1) | (rtz$player_slot == "dire") & (rtz$radiant_win == 0),"win","lose")
-
+rtz$win_lose<- ifelse((rtz$player_slot == "radiant") & (rtz$radiant_win == 1) | (rtz$player_slot == "dire") & (rtz$radiant_win == 0),"win","lose")
+rtz$win_lose <- as.factor(rtz$win_lose)
+#drop rows without results
+rtz <- rtz[!is.na(rtz$win_lose),]
+#drop unparsed replays
+rtz <-dplyr::filter(rtz, hero_id != 0)
 # A plot of kills of each game with jitter and opacity added to visualize region of central
 # tendency
-plot(jitter(rtz$kills,2), main ="Arteezy Kills", xlab = "Match Number", ylab = "Kills", col = alpha("black",0.4), pch = 16)
+plot(jitter(rtz$kills,2), main ="Arteezy Kills", xlab = "Match Number", ylab = "Kills", col = scales::alpha("black",0.4), pch = 16)
 # The mean kill score
 abline(h = mean(rtz$kills), col = "red")
 
@@ -48,3 +56,23 @@ kurtosi(rtz$kills)
 #some noise to the kill scores because otherwise they are all discrete values and will
 #be on top of each other (i.e many games with exactly 6 kills)
 plot(rtz$duration,jitter(rtz$kills,5), col = scales::alpha("black",0.15), pch = 16, xlab = "Match Duration (minutes)", ylab = "Kill Score (kills)", main = "Arteezy Kill Score Vs. Match Duration")
+
+# Side-by-side box plot for Rtz kills and game result
+boxplot(
+  formula = kills ~ win_lose, # y as a function of x
+  data = rtz,
+  xlab = "Result",
+  ylab = "Kill Score (kills)",
+  frame.plot = FALSE, #turn off the frame in the plot
+  whisklty = 1, # solid lines for the whiskers
+  main = "Kill Score by Game Result",
+  boxwex = .75, #make the boxes a little narrower
+  boxfill = "grey80",
+  whiskcol = "grey70",
+  staplecol = "grey70",
+  boxcol = "grey70", #the box borders
+  outcol = "grey70", #the outliers
+  medlwd = "1" # median line thickness
+)
+
+
