@@ -74,5 +74,24 @@ boxplot(
   outcol = "grey70", #the outliers
   medlwd = "1" # median line thickness
 )
+# Filter out Anti-mage, Lifestealer and SF games
+ls_am_sf <- dplyr::filter(rtz, hero_id == "Lifestealer" | hero_id == "Anti-Mage" | hero_id == "Shadow Fiend")
+#drop unused levels in the dataframe
+ls_am_sf <- droplevels(ls_am_sf)
+#get the mean score for each AM and LS respectively
+ls_am_sf_mean <- as.data.frame(ls_am_sf %>% dplyr::group_by(hero_id) %>% dplyr::summarise(mean(kills)))
+colnames(ls_am_sf_mean)[2] <- "Mean"
 
+# Bar plot of mean kill score
+ggplot(data = ls_am_sf_mean, aes(x = hero_id, y = Mean)) + 
+  geom_col(fill = "grey") +
+  #remove grid background, darken axis lines
+  theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank(),
+        panel.background = element_blank(), axis.line = element_line(colour = "black"))+
+  ggtitle("Arteezy Mean Kill Scores for AM, LS and SF") +
+  xlab("Hero Name") + 
+  theme(plot.title = element_text(hjust = 0.5))
 
+#stacked bar plot of kills and win/lose 
+ggplot(ls_am_sf, aes(x = hero_id, fill = win_lose)) + geom_bar() + theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank(),
+                                                                         panel.background = element_blank(), axis.line = element_line(colour = "black"))
