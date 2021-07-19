@@ -29,6 +29,11 @@ rtz$win_lose <- as.factor(rtz$win_lose)
 rtz <- rtz[!is.na(rtz$win_lose),]
 #drop unparsed replays
 rtz <-dplyr::filter(rtz, hero_id != 0)
+#===============================================================================
+############
+# LESSON 1 #
+############
+
 # A plot of kills of each game with jitter and opacity added to visualize region of central
 # tendency
 plot(jitter(rtz$kills,2), main ="Arteezy Kills", xlab = "Match Number", ylab = "Kills", col = scales::alpha("black",0.4), pch = 16)
@@ -51,6 +56,12 @@ skew(rtz$kills)
 
 #kurtosis of kills
 kurtosi(rtz$kills)
+
+
+#===============================================================================
+############
+# LESSON 2 #
+############
 
 #Arteezy kill score vs match duration. I've added a jitter to the kill scores - this adds
 #some noise to the kill scores because otherwise they are all discrete values and will
@@ -93,5 +104,11 @@ ggplot(data = ls_am_sf_mean, aes(x = hero_id, y = Mean)) +
   theme(plot.title = element_text(hjust = 0.5))
 
 #stacked bar plot of kills and win/lose 
-ggplot(ls_am_sf, aes(x = hero_id, fill = win_lose)) + geom_bar() + theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank(),
-                                                                         panel.background = element_blank(), axis.line = element_line(colour = "black"))
+ggplot(ls_am_sf, aes(x = hero_id, fill = win_lose)) + geom_bar() + 
+  theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank(),
+        panel.background = element_blank(), axis.line = element_line(colour = "black")) +
+  ggtitle("Proportions of Wins to Losses for 3 Heroes") +
+  theme(plot.title = element_text(hjust = 0.5))+
+  xlab("Hero Name")+
+  ylab("Count")+
+  labs(fill = "Game Result")
