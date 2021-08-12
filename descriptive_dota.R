@@ -31,7 +31,7 @@ rtz <- rtz[!is.na(rtz$win_lose),]
 rtz <-dplyr::filter(rtz, hero_id != 0)
 #===============================================================================
 ############
-# LESSON 1 #
+# LESSON 1 # - Descriptive Statistics
 ############
 
 # A plot of kills of each game with jitter and opacity added to visualize region of central
@@ -60,7 +60,7 @@ kurtosi(rtz$kills)
 
 #===============================================================================
 ############
-# LESSON 2 #
+# LESSON 2 # - Basic graphing and exploration.
 ############
 
 #Arteezy kill score vs match duration. I've added a jitter to the kill scores - this adds
@@ -112,3 +112,35 @@ ggplot(ls_am_sf, aes(x = hero_id, fill = win_lose)) + geom_bar() +
   xlab("Hero Name")+
   ylab("Count")+
   labs(fill = "Game Result")
+
+#===============================================================================
+############
+# LESSON 3 # Hypothesis Testing.
+############
+#rename hero name colum in RTZ
+colnames(rtz)[5] <- "localized_name"
+rtz_heroes <- merge(rtz,heroes, by = "localized_name")
+
+#Grab 'm' samples of size 'n' and store the mean of each sample
+sample_means <- c()
+m = 1
+n = 30
+for (v in seq(1,m)) {
+  s <- sample(rtz$kills, size = n, replace = TRUE)
+  sample_means <- append(sample_means, mean(s))
+}
+sample_means <- as.data.frame(sample_means)
+mean(sample_means$sample_means)
+hist(sample_means$sample_means, xlab = "Mean Kill Score Of A Sample", main = "Sampling Distribution Of The Sample Means", breaks = 15)
+shapiro.test(sample_means$sample_means)
+#A null distribution of 10000 samples with mean 5 and standard deviation 
+# equal to the standard error : population sigma / sqrt(sample size of one sample)
+SE <- sd(rtz$kills)/sqrt(length(s))
+null_dist <- rnorm(10000,5,sd = SE)
+# histogram of the null distribution
+hist(null_dist, xlab = "Sample Mean", main = "Distribution Of Sample Means for H0")
+abline(v = 5, col = "blue", lwd = 2)
+abline(v = mean(s), col= "red", lwd = 2)
+y <- dnorm(x = null_dist, mean = 5, sd = SE)
+plot(null_dist,y,xlab = "Sample mean", col = scales::alpha("black",0.01 ), pch = 16)
+
