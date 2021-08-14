@@ -144,3 +144,12 @@ abline(v = mean(s), col= "red", lwd = 2)
 y <- dnorm(x = null_dist, mean = 5, sd = SE)
 plot(null_dist,y,xlab = "Sample mean", col = scales::alpha("black",0.01 ), pch = 16)
 
+# Get Arteezy's matches while on Team Secret
+ts1 <- as.Date("2015-01-06")
+ts2 <- as.Date("2015-08-14")
+ts_matches <- rtz_heroes[rtz_heroes$start_time >= ts1 & rtz_heroes$start_time <= ts2,]
+
+# Get Arteezy's matches while on EG (after playing on TS)
+eg1 <- as.Date("2016-09-15")
+eg2 <- as.Date("2020-08-14")
+eg_matches <- rtz_heroes[rtz_heroes$start_time >= eg1 & rtz_heroes$start_time <= eg2,]
