@@ -5,6 +5,7 @@ library(psych)
 library(ggplot2)
 library(dplyr)
 library(plyr)
+library(BSDA)
 #Read a dataset in csv format
 rtz <- read.csv("/Users/udeshhabaraduwa/Google Drive/Misc/Dota2data/rtz.csv")
 heroes <- read.csv("/Users/udeshhabaraduwa/Google Drive/Misc/Dota2data/heroes.csv")
@@ -115,7 +116,7 @@ ggplot(ls_am_sf, aes(x = hero_id, fill = win_lose)) + geom_bar() +
 
 #===============================================================================
 ############
-# LESSON 3 # Hypothesis Testing.
+# LESSON 3 & 4 # Hypothesis Testing, z-test
 ############
 #rename hero name colum in RTZ
 colnames(rtz)[5] <- "localized_name"
@@ -153,3 +154,21 @@ ts_matches <- rtz_heroes[rtz_heroes$start_time >= ts1 & rtz_heroes$start_time <=
 eg1 <- as.Date("2016-09-15")
 eg2 <- as.Date("2020-08-14")
 eg_matches <- rtz_heroes[rtz_heroes$start_time >= eg1 & rtz_heroes$start_time <= eg2,]
+z_score = (7.633 - 7.982)/(4.673/32.78)
+#plot a standard normal distribution
+x <- seq(-4,4, by = 0.1)
+y <- dnorm(x, mean = 0, sd = 1)
+plot(x,y, type = 'l', main = "The Standard Normal (Z) Distribution",
+     xlab = "z-statistic",
+     ylab = "Probability Density")
+#add the z-score and rejection regions
+abline(v = z_score, col = "red")
+text("-2.448", x = z_score, y = max(y), srt= 90, pos = 2, col = "red")
+abline(v = 1.96, col = "blue")
+text("1.96", x = 1.96, y = max(y), srt= 90, pos = 2, col = "blue")
+abline(v = -1.96, col = "blue")
+text("-1.96", x = -1.96, y = max(y), srt= 90, pos = 2, col = "blue")
+# run the complete z.test
+z.test(x = eg_matches$kills, mu = mean(ts_matches$kills), sigma.x = 4.673)
+# run the complete t test
+t.test(x = eg_matches$kills, mu = mean(ts_matches$kills))
